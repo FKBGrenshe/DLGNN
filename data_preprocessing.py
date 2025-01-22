@@ -10,7 +10,7 @@ def load_data(file_path):
 
 def preprocess_data(data):
     """数据预处理：特征和标签的分离，标准化"""
-    features = data.drop('label', axis=1).values
+    features = data.drop('Label', axis=1).values
     labels = data['label'].values
     scaler = StandardScaler()
     features_scaled = scaler.fit_transform(features)
