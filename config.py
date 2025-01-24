@@ -2,7 +2,7 @@
 CONFIG = {
     'learning_rate': 0.01,
     'k_GCNII':10,  # 10层 GCNII
-    'k_GCNII_GRU':2,  # 2层 GCNII-GRU
+    'k_GCNII_GRU':2, # 2层 GCNII-GRU
     'hid_dim':50,
     'weight_decay':0.001,
     'sequence_length':100,

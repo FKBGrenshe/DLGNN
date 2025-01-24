@@ -19,7 +19,7 @@ class GCNII_GRU(Module):
         super(GCNII_GRU, self).__init__()
         self.gcn = GCNII(input_dim, hidden_dim, hidden_dim, num_gcn_layers, alpha, lamda, dropout, device)
         self.gru = GCNIIGRU(hidden_dim, hidden_dim, num_gcn_layers, alpha, lamda, dropout, device, num_gru_layers)
-        self.readout = ReadoutLayer(readout_type)
+        # self.readout = ReadoutLayer(readout_type)
         self.output_layer = Linear(hidden_dim, output_dim)
 
     def forward(self, features_seq, adj_seq):
@@ -33,25 +33,31 @@ class GCNII_GRU(Module):
         """
         k, N, _ = features_seq.shape
         k = features_seq.shape[0]
-        H_seq = torch.zeros_like(features_seq)  # 存储每个时间步的 GCNII 输出
-
+        # H_seq = torch.zeros_like(features_seq)  # 存储每个时间步的 GCNII 输出
+        hidden_dim = self.gcn.convs[-1].out_features  # 从 GCNII 输出层获取隐藏特征维度
+        H_seq = torch.zeros((k, N, hidden_dim), device=features_seq.device)
 
         # 空间特征提取 (GCNII)
         for t in range(k):
-            # H_seq[t] = self.gcn(features_seq[t], adj_seq[t])
+            H_seq[t] = self.gcn(features_seq[t], adj_seq[t])
             # 初始化 H_seq，维度为 (k, N, hidden_dim)
-            hidden_dim = self.gcn.convs[-1].out_features  # 从 GCNII 输出层获取隐藏特征维度
-            H_seq = torch.zeros((k, N, hidden_dim), device=features_seq.device)
+            # hidden_dim = self.gcn.convs[-1].out_features  # 从 GCNII 输出层获取隐藏特征维度
+            # H_seq = torch.zeros((k, N, hidden_dim), device=features_seq.device)
 
-        # 时序特征提取 (GCNII-GRU)
-        hidden_final = self.gru(H_seq, adj_seq)
+        '# 时序特征提取 (GCNII-GRU)'
+        'hidden_final = self.gru(H_seq, adj_seq)'
 
-        # 使用 Readout Layer 提取图级特征
-        graph_embedding = self.readout(hidden_final)  # 输出形状为 (1, hidden_dim)
+        # # 使用 Readout Layer 提取图级特征
+        # graph_embedding = self.readout(hidden_final)  # 输出形状为 (1, hidden_dim)
+        # # 输出层
+        # logits = self.output_layer(graph_embedding)
 
-        # 输出层
-        logits = self.output_layer(graph_embedding)
-        return F.log_softmax(logits, dim=1)
+        'logits = self.output_layer(hidden_final)'
+        logits = self.output_layer(H_seq)
+
+        'crossEntropy  自动计算 log-softmax'
+        # return F.softmax(logits, dim=1)
+        return logits
 
 
 
