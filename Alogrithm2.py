@@ -94,6 +94,9 @@ class GCNIIGRU(Module):
         k, N, C = features_seq.shape
         hidden = torch.zeros((N, C), device=features_seq.device)  # 初始化隐藏状态
 
+        # 保存所有时间步的隐藏状态
+        H_all = []
+
         for t in range(k):
             features_t = features_seq[t]
             adj_t = adj_seq[t]
@@ -102,4 +105,10 @@ class GCNIIGRU(Module):
             for cell in self.gru_cells:
                 hidden = cell(features_t, adj_t, hidden)
 
-        return hidden
+            # 保存当前时间步的隐藏状态
+            H_all.append(hidden.unsqueeze(0))  # 在时间步维度插入一维
+
+        # 将列表中的隐藏状态堆叠为 (K, N, C)
+        H_all = torch.cat(H_all, dim=0)
+
+        return H_all

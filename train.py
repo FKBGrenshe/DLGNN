@@ -66,6 +66,11 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
             # loss = criterion(logits, labels)
             loss = criterion(logits.view(-1, logits.size(-1)), labels.view(-1))
             loss.backward()
+            for name, param in model.named_parameters():
+                if param.requires_grad:
+                    print(
+                        f"{name} - Mean: {param.data.mean().item()} - Grad: {param.grad.abs().mean().item() if param.grad is not None else None}")
+
             optimizer.step()
 
             train_loss += loss.item()
@@ -77,30 +82,31 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
         print(f"Epoch {epoch+1}/{epochs}, Train Loss: {train_loss/len(train_loader):.4f}, Train Acc: {train_acc:.2f}%")
 
         # 验证阶段
-        # model.eval()
-        # val_loss = 0
-        # correct = 0
-        # total = 0
-        # with torch.no_grad():
-        #     for features, adj_matrices, labels in val_loader:
-        #         features, adj_matrices, labels = features.to(device), adj_matrices.to(device), labels.to(device)
-        #
-        #         outputs = model(features, adj_matrices)
-        #         loss = criterion(outputs, labels)
-        #         val_loss += loss.item()
-        #         _, predicted = outputs.max(1)
-        #         correct += (predicted == labels).sum().item()
-        #         total += labels.size(0)
-        #
-        # val_acc = 100. * correct / total
-        # val_loss /= len(val_loader)
-        # print(f"Epoch {epoch+1}/{epochs}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%")
+        model.eval()
+        val_loss = 0
+        correct = 0
+        total = 0
+        with torch.no_grad():
+            for features, adj_matrices, labels in val_loader:
+                adj_matrices = normalize_adj(adj_matrices)
+                features, adj_matrices, labels = features.to(device), adj_matrices.to(device), labels.to(device)
+
+                logits = model(features, adj_matrices)
+                loss = criterion(logits.view(-1, logits.size(-1)), labels.view(-1))
+                val_loss += loss.item()
+                predicted = torch.argmax(F.log_softmax(logits, dim=2), dim=2)
+                correct += (predicted == labels).sum().item()
+                total += labels.size(0)*labels.size(1)
+
+        val_acc = 100. * correct / total
+        val_loss /= len(val_loader)
+        print(f"Epoch {epoch+1}/{epochs}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%")
 
         # 保存最佳模型
-        # if val_loss < best_val_loss:
-        #     best_val_loss = val_loss
-        #     torch.save(model.state_dict(), "best_model.pth")
-        #     print("Saved Best Model!")
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save(model.state_dict(), "best_model.pth")
+            print("Saved Best Model!")
 
 # 主程序
 def main():

@@ -45,15 +45,15 @@ class GCNII_GRU(Module):
             # H_seq = torch.zeros((k, N, hidden_dim), device=features_seq.device)
 
         '# 时序特征提取 (GCNII-GRU)'
-        'hidden_final = self.gru(H_seq, adj_seq)'
+        hidden_final = self.gru(H_seq, adj_seq)
 
         # # 使用 Readout Layer 提取图级特征
         # graph_embedding = self.readout(hidden_final)  # 输出形状为 (1, hidden_dim)
         # # 输出层
         # logits = self.output_layer(graph_embedding)
 
-        'logits = self.output_layer(hidden_final)'
-        logits = self.output_layer(H_seq)
+        logits = self.output_layer(hidden_final)
+        # logits = self.output_layer(H_seq)
 
         'crossEntropy  自动计算 log-softmax'
         # return F.softmax(logits, dim=1)
