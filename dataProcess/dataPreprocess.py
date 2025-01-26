@@ -7,7 +7,7 @@ from dataProcess.GraphBuild import *
 from sklearn.preprocessing import StandardScaler
 def Step1(max_length):
 
-    data = pd.read_csv('D:\\学习\\论文\\2024new-第二篇\\pmy\\dataset\\NF-BoT-IoT\\data\\NF-BoT-IoT.csv')
+    data = pd.read_csv('//root//autodl-tmp//dataset//NF-BoT-IoT//data//NF-BoT-IoT.csv')
     # filtered_IP_list = pd.read_csv('D:\\学习\\论文\\2024new-第二篇\\pmy\\DLGNN\\PreprocessedDataSet\\Preprocessed_NF-BoT-IoT.csv')
 
     '新添加特征'
@@ -111,7 +111,7 @@ def Step1(max_length):
             save_df = pd.DataFrame(FinalDataList)
 
             # 保存为 CSV 文件
-            csv_path = "//root//autodl-tmp//DLGNN//PreprocessedDataSet//Processed_NF-BoT-IoT.csv"
+            csv_path = "//root//autodl-tmp//DLGNN//PreprocessdDataset//Processed_NF-BoT-IoT.csv"
             save_df.to_csv(csv_path, index=False)
             print(f"数据已保存到 {csv_path}")
 

@@ -1,7 +1,8 @@
 from Alogrithm1 import *
 from Alogrithm2 import *
 from ReadOutLayer import *
-class GCNII_GRU(Module):
+
+class DLGNN(Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_gcn_layers, num_gru_layers, alpha, lamda, dropout, device, readout_type):
         """
         完整模型：GCNII + GCNII-GRU + Readout Layer
@@ -16,7 +17,7 @@ class GCNII_GRU(Module):
         - dropout: Dropout 比例
         - device: 设备 (CPU/GPU)
         """
-        super(GCNII_GRU, self).__init__()
+        super(DLGNN, self).__init__()
         self.gcn = GCNII(input_dim, hidden_dim, hidden_dim, num_gcn_layers, alpha, lamda, dropout, device)
         self.gru = GCNIIGRU(hidden_dim, hidden_dim, num_gcn_layers, alpha, lamda, dropout, device, num_gru_layers)
         # self.readout = ReadoutLayer(readout_type)
@@ -68,7 +69,7 @@ class GCNII_GRU(Module):
 #     adj_seq = torch.stack([torch.eye(N) for _ in range(k)])  # 简单的对角邻接矩阵序列
 #
 #     # 初始化模型
-#     model = GCNII_GRU(
+#     model = DLGNN(
 #         input_dim=C, hidden_dim=32, output_dim=3,
 #         num_gcn_layers=10, num_gru_layers=2,
 #         alpha=0.5, lamda=1.0, dropout=0.3,
