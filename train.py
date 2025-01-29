@@ -10,8 +10,6 @@ from dataProcess.dataPreprocess import *
 from dataProcess.GraphBuild import *
 from utils import *
 
-# 假设 GCNIIGRU 类已经定义并导入
-# from model import GCNIIGRU
 
 # 数据集定义
 class GraphTimeSeriesDataset(Dataset):
